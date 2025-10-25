@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Market Pro</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #001233; /* Bleu de nuit */
+    color: white;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .hidden { display: none; }
+  h1 { text-align: center; font-size: 2.5em; margin: 20px 0; }
+  h2 { text-align: center; font-size: 2em; margin: 15px 0; }
+  h3 { text-align: center; font-size: 1.5em; margin: 10px 0; }
+  button {
+    background: #0078ff;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.3s;
+  }
+  button:hover { background: #00b4d8; }
+
+  .center { text-align: center; margin-top: 40px; }
+
+  /* --- Galerie produits - Layout Publicitaire --- */
+  .produits {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 15px;
+    padding: 15px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .produit {
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  
+  .produit:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    border-color: #0078ff;
+  }
+  .produit img {
+    width: 100%;
+    border-radius: 15px;
+    height: 200px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s;
+    border: 3px solid rgba(255,255,255,0.2);
+  }
+  .btn-mini {
+    background: linear-gradient(45deg, #ffaa00, #ff6600);
+    color: white;
+    font-size: 16px;
+    margin: 8px;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(255,170,0,0.3);
+    transition: all 0.3s;
+  }
+  
+  .btn-mini:hover {
+    background: linear-gradient(45deg, #ff6600, #ffaa00);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,170,0,0.5);
+  }
+  .reservation-item {
+    background: rgba(255,255,255,0.05);
+    margin: 15px;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 16px;
+  }
+  input, textarea, select {
+    width: 80%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    margin-top: 10px;
+    font-size: 16px;
+  }
+
+  /* Modal pour agrandir les images */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+  }
+
+  .modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    max-height: 80%;
+    margin-top: 5%;
+  }
+
+  .modal-content img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+
+  .close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    color: #bbb;
+  }
+
+  /* Images cliquables */
+  .produit img {
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .produit img:hover {
+    transform: scale(1.05);
+  }
+
+  /* Style publicitaire pour les titres de produits */
+  .produit h3 {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #ffaa00;
+    margin: 15px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    background: linear-gradient(45deg, #ffaa00, #ff6600);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Logo styling */
+  .logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 15px auto;
+    display: block;
+    object-fit: cover;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+  }
+
+  .logo-small {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 10px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  /* Boutons de contact avec logos */
+  .contact-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .contact-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: white;
+    min-width: 150px;
+    justify-content: center;
+  }
+
+  .whatsapp-btn {
+    background: linear-gradient(45deg, #25D366, #128C7E);
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+  }
+
+  .whatsapp-btn:hover {
+    background: linear-gradient(45deg, #128C7E, #25D366);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+  }
+
+  .email-btn {
+    background: linear-gradient(45deg, #EA4335, #D33B2C);
+    box-shadow: 0 4px 15px rgba(234, 67, 53, 0.3);
+  }
+
+  .email-btn:hover {
+    background: linear-gradient(45deg, #D33B2C, #EA4335);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(234, 67, 53, 0.5);
+  }
+
+  .facebook-btn {
+    background: linear-gradient(45deg, #1877F2, #0D47A1);
+    box-shadow: 0 4px 15px rgba(24, 119, 242, 0.3);
+  }
+
+  .facebook-btn:hover {
+    background: linear-gradient(45deg, #0D47A1, #1877F2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(24, 119, 242, 0.5);
+  }
+
+  .contact-icon {
+    font-size: 20px;
+  }
+
+  /* État sélectionné pour les boutons de contact */
+  .contact-btn.selected {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    border: 3px solid #fff;
+  }
+
+  .whatsapp-btn.selected {
+    background: linear-gradient(45deg, #128C7E, #25D366);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6);
+  }
+
+  .email-btn.selected {
+    background: linear-gradient(45deg, #D33B2C, #EA4335);
+    box-shadow: 0 8px 25px rgba(234, 67, 53, 0.6);
+  }
+
+  .facebook-btn.selected {
+    background: linear-gradient(45deg, #0D47A1, #1877F2);
+    box-shadow: 0 8px 25px rgba(24, 119, 242, 0.6);
+  }
+
+  /* Modal de compte à rebours */
+  .countdown-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+
+  .countdown-content {
+    background: linear-gradient(45deg, #001233, #003366);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    border: 3px solid #0078ff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .countdown-timer {
+    font-size: 4em;
+    font-weight: bold;
+    color: #ffaa00;
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .countdown-message {
+    font-size: 1.2em;
+    color: white;
+    margin: 20px 0;
+  }
+
+  .countdown-platform {
+    font-size: 1.5em;
+    color: #0078ff;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- === From 1 === -->
+<section id="from1">
+  <img src="Logos.jfif" alt="Logo E-Market Pro" class="logo">
+  <h1>E-Market Pro</h1>
+  <div class="center">
+    <button onclick="goTo('from2')"> Entrer & Visite </button>
+  </div>
+</section>
+
+<!-- === From 2 === -->
+<section id="from2" class="hidden">
+  <img src="Logos.jfif" alt="Logo E-Market Pro" class="logo-small">
+  <h2>Menu Principal</h2>
+  <div class="center">
+    <button onclick="goTo('from3')"> Accueil </button>
+    <button onclick="goTo('from4')"> Réservation </button>
+    <button onclick="goTo('from5')"> Message </button>
+    <button onclick="goTo('from6')"> Nos Adresses </button>
+  </div>
+</section>
+
+<!-- === From 3 : Accueil === -->
+<section id="from3" class="hidden">
+  <img src="Logos.jfif" alt="Logo E-Market Pro" class="logo-small">
+  <h2>Accueil et Nouveauté</h2>
+  <div class="produits">
+    <!-- Les produits seront chargés automatiquement ici -->
+  </div>
+  <div class="center">
+    <button onclick="goTo('from2')"> Retour </button>
+  </div>
+</section>
+<section id="from4" class="hidden">
+  <img src="Logos.jfif" alt="Logo E-Market Pro" class="logo-small">
+  <h2>Vos Réservations</h2>
+  <div id="reservationList"></div>
+  <div class="center">
+    <h3>Total : <span id="totalPrice">0</span>$</h3>
+    <button onclick="validerReservation()"> Valider la Réservation </button>
+    <button onclick="goTo('from2')"> Retour </button>
+  </div>
+</section>
+
+<!-- === From 5 : Message === -->
+<section id="from5" class="hidden">
+  <img src="Logos.jfif" alt="Logo E-Market Pro" class="logo-small">
+  <h2>Rédigez votre souhait</h2>
+  <div class="center">
+    <h3>Choisissez votre méthode de contact :</h3>
+    <div class="contact-buttons">
+      <button class="contact-btn whatsapp-btn" onclick="envoyerMessage('whatsapp')" id="whatsappBtn">
+        <span class="contact-icon">📱</span>
+        WhatsApp
+      </button>
+      <button class="contact-btn email-btn" onclick="envoyerMessage('email')" id="emailBtn">
+        <span class="contact-icon">📧</span>
+        Email
+      </button>
+      <button class="contact-btn facebook-btn" onclick="envoyerMessage('facebook')" id="facebookBtn">
+        <span class="contact-icon">📘</span>
+        Facebook
+      </button>
+    </div>
+    <textarea id="messageText" rows="4" placeholder="Écrivez votre message ici..." style="width: 80%; margin: 20px 0;"></textarea><br>
+    <button onclick="envoyerMessageAvecSelection()" style="background: linear-gradient(45deg, #0078ff, #00b4d8); color: white; padding: 15px 30px; border: none; border-radius: 25px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 10px; box-shadow: 0 4px 15px rgba(0,120,255,0.3); transition: all 0.3s;"> Envoyer </button>
+    <button onclick="goTo('from2')"> Retour </button>
+  </div>
+</section>
+
+<!-- === From 6 : Nos Adresses === -->
+<section id="from6" class="hidden">
+  <img src="Logos.jfif" alt="Logo E-Market Pro" class="logo">
+  <h2>Nos Adresses</h2>
+  <p class="center">
+    📍 Adresse Physique : RD Congo/Kinshasa Limete Mombele<br>
+    📞 Téléphone : +243 821 145 153<br>
+    📧 Email : ousumanmalikbinhassan@gmail.com<br>
+    🌐 Facebook : Exauce Nzeyidio
+  </p>
+  <h3 class="center">Créateur du site : Ousuman Malik Bin Hassan</h3>
+  <div class="center">
+    <button onclick="goTo('from2')"> Retour </button>
+  </div>
+</section>
+
+<!-- === From 7 : Commentaires === -->
+<section id="from7" class="hidden">
+  <img src="Logos.jfif" alt="Logo E-Market Pro" class="logo-small">
+  <h2>Commentaires</h2>
+  <div class="center">
+    <h3>Laissez votre commentaire</h3>
+    <textarea id="commentText" rows="4" placeholder="Écrivez votre commentaire ici..." style="width: 80%; margin: 10px 0;"></textarea><br>
+    <button onclick="envoyerCommentaire()"> Envoyer </button><br><br>
+    <button onclick="goTo('from3')"> Retour </button>
+  </div>
+</section>
+
+<!-- Modal pour agrandir les images -->
+<div id="imageModal" class="modal">
+  <span class="close" onclick="closeModal()">&times;</span>
+  <div class="modal-content">
+    <img id="modalImage" src="" alt="">
+  </div>
+</div>
+
+<!-- Modal de compte à rebours -->
+<div id="countdownModal" class="countdown-modal">
+  <div class="countdown-content">
+    <h2>Ouverture en cours...</h2>
+    <div class="countdown-platform" id="platformName">WhatsApp</div>
+    <div class="countdown-timer" id="countdownTimer">10</div>
+    <div class="countdown-message">Veuillez patienter pendant que nous ouvrons l'application</div>
+  </div>
+</div>
+
+<script>
+  // navigation entre les sections
+  function goTo(id) {
+    document.querySelectorAll('section').forEach(s=> s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    
+    // Si on va vers from3, charger automatiquement les produits
+    if (id === 'from3') {
+      setTimeout(chargerProduits, 100); // Petit délai pour s'assurer que la section est visible
+    }
+    // Si on va vers from4, afficher automatiquement les réservations
+    else if (id === 'from4') {
+      afficherReservations();
+    }
+    // Si on va vers from5, initialiser la sélection WhatsApp
+    else if (id === 'from5') {
+      setTimeout(() => {
+        document.getElementById('whatsappBtn').classList.add('selected');
+      }, 100);
+    }
+  }
+
+  // gestion des réservations
+  let reservations = [];
+  let methodeContactSelectionnee = 'whatsapp'; // Méthode par défaut
+  
+  function addReservation(nom, prix, image) {
+    reservations.push({nom, prix, image});
+    alert(`${nom} ajouté à la réservation`);
+  }
+
+  // Système d'incrémentation automatique des produits
+  function chargerProduits() {
+    const produitsContainer = document.querySelector('.produits');
+    if (!produitsContainer) return;
+    
+    // Liste des produits avec leurs informations
+    const produits = [
+      {nom: 'Culotte', prix: 15, image: 'Produits 1.jfif'},
+      {nom: 'Chemise', prix: 15, image: 'Produits 2.jfif'},
+      {nom: 'Veste', prix: 15, image: 'Produits 3.jfif'},
+      {nom: 'Lipupa', prix: 15, image: 'Produits 4.jfif'}
+    ];
+    
+    // Vérifier automatiquement les produits supplémentaires
+    for (let i = 5; i <= 20; i++) {
+      const imagePath = `Produits ${i}.jfif`;
+      // Créer un élément image temporaire pour tester si le fichier existe
+      const testImg = new Image();
+      testImg.onload = function() {
+        // Si l'image se charge, elle existe
+        produits.push({
+          nom: `Produit ${i}`,
+          prix: 15,
+          image: imagePath
+        });
+        afficherProduits(produits);
+      };
+      testImg.onerror = function() {
+        // Si l'image ne se charge pas, elle n'existe pas
+        // Arrêter la vérification après 3 erreurs consécutives
+        if (i > 5 && !produits.find(p => p.image === `Produits ${i-1}.jfif`)) {
+          return;
+        }
+      };
+      testImg.src = imagePath;
+    }
+    
+    // Afficher les produits initiaux
+    afficherProduits(produits);
+  }
+
+  function afficherProduits(produits) {
+    const produitsContainer = document.querySelector('.produits');
+    if (!produitsContainer) return;
+    
+    produitsContainer.innerHTML = '';
+    
+    produits.forEach(produit => {
+      const produitDiv = document.createElement('div');
+      produitDiv.className = 'produit';
+      produitDiv.innerHTML = `
+        <img src="${produit.image}" alt="${produit.nom}" onclick="openModal('${produit.image}')">
+        <h3>${produit.nom} - ${produit.prix}$</h3>
+        <button class="btn-mini" onclick="addReservation('${produit.nom}',${produit.prix},'${produit.image}')"> Réserver </button>
+        <button class="btn-mini" onclick="goTo('from7')"> Commentaire </button>
+      `;
+      produitsContainer.appendChild(produitDiv);
+    });
+  }
+
+  function afficherReservations() {
+    const list = document.getElementById('reservationList');
+    list.innerHTML = '';
+    let total = 0;
+    
+    if (reservations.length === 0) {
+      list.innerHTML = '<div class="reservation-item"><p>Aucune réservation pour le moment</p></div>';
+      document.getElementById('totalPrice').textContent = total;
+      return;
+    }
+    
+    reservations.forEach((r, index) => {
+      total += r.prix;
+      list.innerHTML += `
+        <div class="reservation-item">
+          <img src="${r.image}" width="150" style="border-radius: 10px; margin-bottom: 10px;"><br>
+          <strong>${r.nom}</strong> - <span style="color: #ffaa00;">${r.prix}$</span>
+          <button class="btn-mini" onclick="supprimerReservation(${index})" style="margin-left: 10px;">Supprimer</button>
+        </div>`;
+    });
+    document.getElementById('totalPrice').textContent = total;
+  }
+
+  function supprimerReservation(index) {
+    reservations.splice(index, 1);
+    afficherReservations();
+  }
+
+  function validerReservation() {
+    if (reservations.length === 0) {
+      alert("Aucune réservation sélectionnée !");
+      return;
+    }
+    let code = Math.floor(1000 + Math.random() * 9000);
+    alert(`Voici votre code de réservation : ${code}`);
+    reservations = [];
+    afficherReservations();
+  }
+
+  // redessiner la liste à chaque entrée dans from4
+  document.getElementById('from4').addEventListener('click', afficherReservations);
+
+  // message avec compte à rebours
+  function envoyerMessage(methode) {
+    methodeContactSelectionnee = methode; // Stocker la méthode sélectionnée
+    
+    // Retirer la classe selected de tous les boutons
+    document.querySelectorAll('.contact-btn').forEach(btn => btn.classList.remove('selected'));
+    
+    // Ajouter la classe selected au bouton cliqué
+    if (methode === 'whatsapp') {
+      document.getElementById('whatsappBtn').classList.add('selected');
+    } else if (methode === 'email') {
+      document.getElementById('emailBtn').classList.add('selected');
+    } else if (methode === 'facebook') {
+      document.getElementById('facebookBtn').classList.add('selected');
+    }
+    
+    let texte = encodeURIComponent(document.getElementById('messageText').value);
+    if (!texte) { alert("Veuillez rédiger un message"); return; }
+
+    // Démarrer le compte à rebours
+    demarrerCompteARebours(methode, texte);
+  }
+
+  // Fonction de compte à rebours
+  function demarrerCompteARebours(methode, texte) {
+    const modal = document.getElementById('countdownModal');
+    const timerElement = document.getElementById('countdownTimer');
+    const platformElement = document.getElementById('platformName');
+    
+    // Définir le nom de la plateforme
+    if (methode === 'whatsapp') {
+      platformElement.textContent = 'WhatsApp';
+    } else if (methode === 'email') {
+      platformElement.textContent = 'Email';
+    } else {
+      platformElement.textContent = 'Facebook';
+    }
+    
+    // Afficher le modal
+    modal.style.display = 'flex';
+    
+    let compteur = 10;
+    timerElement.textContent = compteur;
+    
+    const interval = setInterval(() => {
+      compteur--;
+      timerElement.textContent = compteur;
+      
+      if (compteur <= 0) {
+        clearInterval(interval);
+        modal.style.display = 'none';
+        
+        // Ouvrir l'application
+        if (methode === 'whatsapp')
+          window.open(`https://wa.me/243821145153?text=${texte}`);
+        else if (methode === 'email')
+          window.open(`mailto:ousumanmalikbinhassan@gmail.com?subject=Message&body=${texte}`);
+        else
+          window.open(`https://www.facebook.com/ExauceNzeyidio`);
+      }
+    }, 1000);
+  }
+
+  // Fonction pour envoyer avec la méthode sélectionnée
+  function envoyerMessageAvecSelection() {
+    let texte = encodeURIComponent(document.getElementById('messageText').value);
+    if (!texte) { alert("Veuillez rédiger un message"); return; }
+
+    // Démarrer le compte à rebours avec la méthode sélectionnée
+    demarrerCompteARebours(methodeContactSelectionnee, texte);
+  }
+
+  // message depuis From 3
+  function envoyerMessageFrom3() {
+    let texte = encodeURIComponent(document.getElementById('messageFrom3').value);
+    if (!texte) { alert("Veuillez rédiger un message"); return; }
+    
+    window.open(`mailto:ousumanmalikbinhassan@gmail.com?subject=Message depuis Accueil&body=${texte}`);
+    document.getElementById('messageFrom3').value = ''; // Vider le textarea après envoi
+  }
+
+  // Fonctions pour le modal d'agrandissement d'image
+  function openModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    modal.style.display = 'block';
+    modalImg.src = imageSrc;
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+  }
+
+  // Fermer le modal en cliquant en dehors de l'image
+  window.onclick = function(event) {
+    const modal = document.getElementById('imageModal');
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  // Fermer le modal avec la touche Échap
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  });
+</script>
+</body>
+</html>
